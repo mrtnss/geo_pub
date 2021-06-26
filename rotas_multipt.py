@@ -39,7 +39,6 @@ for i in range(0,len(pt)):
 	else:
 		pass
   
-  
 ##aqui para gerar shp com a rota (linha)
 route_nodes=nodes_proj.loc[rc]
 route_line=LineString(list(route_nodes.geometry.values))
