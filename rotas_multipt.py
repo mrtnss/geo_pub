@@ -1,7 +1,10 @@
+import os
 import osmnx as ox
 import geopandas as gpd
 import networkx as nx
 from shapely.geometry import Point, LineString
+
+os.chdir('diretório') ##incluir diretório aqui
 
 name = "Niteroi, Rio de Janeiro, Brazil" ##nome do municipio/estado/país para download do OSM
 graph = ox.graph_from_place(name, network_type = 'drive')
@@ -9,8 +12,8 @@ nodes = ox.graph_to_gdfs(graph, nodes=True,edges=False)
 projecao = 32723 ##EPSG para reprojetar
 
 graph = ox.project_graph(graph, to_crs = projecao) ##reprojeção
-graph = ox.add_edge_speeds(graph_proj) ##incluir limites de velocidade
-graph = ox.add_edge_travel_times(graph_proj)
+graph = ox.add_edge_speeds(graph) ##incluir limites de velocidade
+graph = ox.add_edge_travel_times(graph)
 
 pt = gpd.read_file('arq_pt.shp') ##insere shapefile com os endereços com algum campo dizendo a ordem deles
 pt = gpd.GeoDataFrame(pontos,geomtry='geometry',crs=pontos.crs)
