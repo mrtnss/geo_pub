@@ -11,12 +11,13 @@ graph = ox.graph_from_place(name, network_type = 'drive')
 nodes = ox.graph_to_gdfs(graph, nodes=True,edges=False)
 projecao = 32723 ##EPSG para reprojetar
 
-graph = ox.project_graph(graph, to_crs = projecao) ##reprojeção
-graph = ox.add_edge_speeds(graph) ##incluir limites de velocidade
-graph = ox.add_edge_travel_times(graph)
+graph_proj = ox.project_graph(graph, to_crs = projecao) ##reprojeção
+graph_proj = ox.add_edge_speeds(graph_proj) ##incluir limites de velocidade
+graph_proj = ox.add_edge_travel_times(graph_proj)
+nodes_proj, edges_proj = ox.graph_to_gdfs(graph_proj, nodes=True, edges=True)
 
 pt = gpd.read_file('arq_pt.shp') ##insere shapefile com os endereços com algum campo dizendo a ordem deles
-pt = gpd.GeoDataFrame(pontos,geomtry='geometry',crs=pontos.crs)
+pt = gpd.GeoDataFrame(pt,geometry='geometry',crs=pt.crs)
 pt.sort_values(by=['Id'],inplace=True) ##ordena os pontos em função do campo de ordem (aqui usei 'Id')
 pt.index = range(0,len(pt))
  
@@ -28,7 +29,7 @@ for i in range(0,len(pt)):
 	ini_xy = (inicio.y,inicio.x)
 	ini_node = ox.get_nearest_node(graph, ini_xy, method = 'euclidean') ##extrai o nó do OSM mais próximo do ponto    
   
-	fim =  pt[i+1]['geometry'] #extrai as informações do novo ponto final
+	fim =  pt.loc[i+1,]['geometry'] #extrai as informações do novo ponto final
 	fim = Point(fim.x,fim.y)  
 	fim_xy = (fim.y, fim.x)
 	fim_node = ox.get_nearest_node(graph, fim_xy, method = 'euclidean')
