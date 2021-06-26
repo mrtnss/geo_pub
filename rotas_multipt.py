@@ -16,12 +16,12 @@ graph_proj = ox.add_edge_speeds(graph_proj) ##incluir limites de velocidade
 graph_proj = ox.add_edge_travel_times(graph_proj)
 nodes_proj, edges_proj = ox.graph_to_gdfs(graph_proj, nodes=True, edges=True)
 
-pt = gpd.read_file('arq_pt.shp') ##insere shapefile com os endereços com algum campo dizendo a ordem deles
+pt = gpd.read_file('arq_pt.shp') ##insere shapefile com os endereços com algum campo dizendo a ordem deles - usar SRC WGS84
 pt = gpd.GeoDataFrame(pt,geometry='geometry',crs=pt.crs)
 pt.sort_values(by=['Id'],inplace=True) ##ordena os pontos em função do campo de ordem (aqui usei 'Id')
 pt.index = range(0,len(pt))
  
-rc = [] #lista que vai virar a rota consolidada
+rc = [] #lista que vai virar os trechos das rotas
   
 for i in range(0,len(pt)):
 	inicio = pt.loc[i,]['geometry'] ##extrai o novo ponto inicial
@@ -42,9 +42,14 @@ for i in range(0,len(pt)):
 		break
 	else:
 		pass
-  
+
+rota = [] #mescla de trechos (rota final)
+for i in range(0,len(rc)):
+    for j in range(0,len(rc[i])):
+        rota.append(rc[i][j])
+	
 ##aqui para gerar shp com a rota (linha)
-route_nodes=nodes_proj.loc[rc]
+route_nodes=nodes_proj.loc[rota]
 route_line=LineString(list(route_nodes.geometry.values))
 route_geom=gpd.GeoDataFrame([[route_line]],geometry='geometry',
          crs=edges_proj.crs,columns=['geometry'])
